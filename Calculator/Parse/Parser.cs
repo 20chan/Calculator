@@ -61,6 +61,9 @@ namespace Calculator.Parse
                                 case '%':
                                     result.Add(new Token(TokenType.PERCENT, "%"));
                                     break;
+                                case '^':
+                                    result.Add(new Token(TokenType.CARET, "^"));
+                                    break;
                                 case '(':
                                     result.Add(new Token(TokenType.LPAREN, "("));
                                     break;
@@ -112,9 +115,9 @@ namespace Calculator.Parse
             return result;
         }
 
-        public static List<Token> ToPostFix(List<Token> toks)
+        public static ExprNode ToPostFix(List<Token> toks)
         {
-            Queue<Token> output = new Queue<Token>();
+            Stack<ExprNode> output = new Stack<ExprNode>();
             Stack<Token> ops = new Stack<Token>();
             for(int i = 0; i < toks.Count; i++)
             {
@@ -124,7 +127,7 @@ namespace Calculator.Parse
                 {
                     case TokenType.NUMBER:
                         {
-                            output.Enqueue(cur);
+                            output.Push(new ExprNode(cur));
                             break;
                         }
                     case TokenType.FUNCTION:
@@ -136,7 +139,7 @@ namespace Calculator.Parse
                         {
                             while(ops.Peek().Type != TokenType.LPAREN)
                             {
-                                output.Enqueue(ops.Pop());
+                                output.Push(new ExprNode(ops.Pop()));
                             }
                             break;
                         }
@@ -156,7 +159,16 @@ namespace Calculator.Parse
                             {
                                 if (cur.Type != TokenType.CARET && cur.Level <= ops.Peek().Level
                                     || cur.Type == TokenType.CARET && cur.Level < ops.Peek().Level)
-                                    output.Enqueue(ops.Pop());
+                                {
+                                    ExprNode l = output.Pop();
+                                    ExprNode r = output.Pop();
+                                    output.Push(new ExprNode(ops.Pop(), l, r));
+                                    if (ops.Count == 0)
+                                    {
+                                        ops.Push(cur);
+                                        break;
+                                    }
+                                }
                                 else
                                 {
                                     ops.Push(cur);
@@ -173,7 +185,11 @@ namespace Calculator.Parse
                     case TokenType.RPAREN:
                         {
                             while (ops.Peek().Type != TokenType.LPAREN)
-                                output.Enqueue(ops.Pop());
+                            {
+                                ExprNode l = output.Pop();
+                                ExprNode r = output.Pop();
+                                output.Push(new ExprNode(ops.Pop(), l, r));
+                            }
                             ops.Pop();
                             break;
                         }
@@ -184,10 +200,12 @@ namespace Calculator.Parse
             {
                 if (ops.Peek().Type == TokenType.LPAREN || ops.Peek().Type == TokenType.RPAREN)
                     throw new Exception(); // Error
-                output.Enqueue(ops.Pop());
+                ExprNode l = output.Pop();
+                ExprNode r = output.Pop();
+                output.Push(new ExprNode(ops.Pop(), l, r));
             }
 
-            return output.ToList();
+            return output.Pop();
         }
         
         private static string subString(string str, int mark, int cur)

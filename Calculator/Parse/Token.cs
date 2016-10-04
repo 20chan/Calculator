@@ -17,6 +17,7 @@ namespace Calculator.Parse
                 case '*':
                 case '/':
                 case '%':
+                case '^':
                 case '(':
                 case ')':
                 case ',':

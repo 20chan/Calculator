@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Parse\ExprNode.cs" />
     <Compile Include="Parse\Parser.cs" />
     <Compile Include="Parse\Token.cs" />
     <Compile Include="Program.cs" />

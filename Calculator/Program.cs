@@ -9,13 +9,14 @@ namespace Calculator
     {
         static void Main(string[] args)
         {
-            while(true)
+            while (true)
             {
                 string code = Console.ReadLine();
-                Console.WriteLine(string.Join(" ", Parse.Parser.Separate(code)
+                /*Console.WriteLine(string.Join(" ", Parse.Parser.Separate(code)
                     .Select(t => t.Value)));
-                Console.WriteLine(string.Join(" ", Parse.Parser.ToPostFix(Parse.Parser.Separate(code))
-                     .Select(t => t.Value)));
+                */
+                var fix = Parse.Parser.ToPostFix(Parse.Parser.Separate(code));
+                Console.WriteLine(fix.Calc());
             }
         }
     }
