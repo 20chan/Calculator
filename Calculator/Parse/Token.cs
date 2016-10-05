@@ -29,11 +29,13 @@ namespace Calculator.Parse
         public TokenType Type;
         public int Level; //Level of operator
         public string Value;
+        public bool isFunction;
 
         public Token(TokenType type, string val)
         {
             Type = type;
             Value = val;
+            isFunction = false;
             Level = 1;
             if (type == TokenType.PLUS || type == TokenType.MINUS)
                 Level = 2;
@@ -41,7 +43,7 @@ namespace Calculator.Parse
                 Level = 3;
             if (type == TokenType.CARET)
                 Level = 4;
-            if (type == TokenType.FUNCTION)
+            if (type == TokenType.VAR)
                 Level = 5;
         }
     }
@@ -50,7 +52,7 @@ namespace Calculator.Parse
     {
         NONE,
         NUMBER,
-        FUNCTION,
+        VAR,
         PLUS, // +
         MINUS, // -
         ASTERISK, // *

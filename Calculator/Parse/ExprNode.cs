@@ -34,7 +34,7 @@ namespace Calculator.Parse
             }
         }
 
-        public double Calc()
+        public virtual double Calc()
         {
             if (Tok.Type == TokenType.NUMBER)
                 return Convert.ToDouble(Tok.Value);
@@ -51,6 +51,40 @@ namespace Calculator.Parse
             else if (Tok.Type == TokenType.CARET)
                 return Math.Pow(Right.Calc(), Left.Calc());
             throw new Exception();
+        }
+    }
+
+    public class VarNode : ExprNode
+    {
+        public static Table.Variables Vars = new Table.Variables();
+        public VarNode(Token tok) : base(tok)
+        {
+
+        }
+
+        public override double Calc()
+        {
+            return Vars.GetVar(Tok.Value);
+        }
+    }
+
+    public class FunctionNode : ExprNode
+    {
+        public static Table.Functions Funcs = new Table.Functions();
+        private List<ExprNode> _args = new List<ExprNode>();
+        public FunctionNode(Token tok) : base(tok)
+        {
+
+        }
+
+        public void AddArgument(ExprNode expr)
+        {
+            _args.Add(expr);
+        }
+
+        public override double Calc()
+        {
+            return Funcs.Calc(Tok.Value, _args.Select(e => e.Calc()).ToArray());
         }
     }
 }
